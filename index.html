@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>Draw</h1>
+    <canvas></canvas>
+    <div id="controls">
+        <!-- <button id="add-random-point" onclick="addRandomPoint()">Add Random Point</button>
+        <button id="add-random-segment" onclick="addRandomSegment()">Add Random Segment</button>
+        <button id="remove-random-point" onclick="removeRandomPoint()">Remove Random Point</button>
+        <button id="remove-random-segment" onclick="removeRandomSegment()">Remove Random Segment</button>
+        <button id="remove-all" onclick="removeAll()">Remove All</button> -->
+    </div>
+    <script src="js/primitives/point.js"></script>
+    <script src="js/primitives/segment.js"></script>
+    <script src="js/math/utils.js"></script>
+    <script src="js/math/graph.js"></script>
+    <script src="js/graphEditor.js"></script>
+    <script src="js/viewport.js"></script>
+    <script>
+        const canvas = document.querySelector("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = 600;
+        canvas.height = 600;
+        
+        function addRandomPoint() {
+            const success = graph.tryAddPoint(
+                new Point(
+                    Math.random() * canvas.width, 
+                    Math.random() * canvas.height
+                )
+            );
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            graph.draw(ctx);
+            console.log(success);
+        }
+
+        function addRandomSegment() {
+            if (graph.points.length < 2) {
+                return console.log("not enough points");
+            }
+            const index1 = Math.floor(Math.random() * graph.points.length);
+            const index2 = Math.floor(Math.random() * graph.points.length);
+            const success = graph.tryAddSegment(new Segment(graph.points[index1], graph.points[index2]));
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            graph.draw(ctx);
+            console.log(success);
+        }
+
+        function removeRandomSegment() {
+            if (graph.segments.length == 0) {
+                return console.log("no segments");
+            }
+
+            const index = Math.floor(Math.random() * graph.segments.length);
+            const segment = graph.segments[index];
+            graph.removeSegment(segment);
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            graph.draw(ctx);
+
+        }
+
+        function removeRandomPoint() {
+            if (graph.points.length == 0) {
+                return console.log("no points");
+            }
+
+            const index = Math.floor(Math.random() * graph.points.length);
+            const point = graph.points[index];
+
+
+            graph.removePoint(point);
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            graph.draw(ctx);
+        }
+
+        function removeAll() {
+            graph.dispose();
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            graph.draw(ctx);
+        }
+
+        // for funsies
+        function shotgun(center, spread=50, shots=5) {
+            for (let i = 0; i < 5; i++) {
+                graph.addPoint(new Point(center.x + (Math.random() - 0.5) * spread, center.y + (Math.random() - 0.5) * spread))
+            }
+        }
+
+        const p1 = new Point(200, 200, "1")
+        const p2 = new Point(500, 200, "2")
+        const p3 = new Point(400, 400, "3")
+        const p4 = new Point(100, 300, "4")
+
+        const s1 = new Segment(p1, p2);
+        const s2 = new Segment(p1, p3);
+        const s3 = new Segment(p1, p4);
+        const s4 = new Segment(p2, p3);
+
+        const graph = new Graph([p1, p2, p3, p4], [s1, s2, s3, s4]);
+        const viewport = new Viewport(canvas);
+        const graphEditor = new GraphEditor(canvas, graph);
+
+        animate();
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // ctx.save();
+            // ctx.scale(1 / viewport.zoom, 1 / viewport.zoom);
+            graphEditor.display();
+            // ctx.restore();
+            requestAnimationFrame(animate)
+        }
+
+    </script>
+</body>
+
+</html>
