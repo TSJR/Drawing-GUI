@@ -41,6 +41,10 @@ class Point {
     }
     
     equals(point) {
+        if (!point) {
+            //console.log("Problem with " + point)
+            return false;
+        }
         return this.x == point.x && this.y == point.y;
     }
 

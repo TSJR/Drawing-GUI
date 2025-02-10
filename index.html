@@ -8,11 +8,12 @@
     <h1>Draw</h1>
     <canvas></canvas>
     <div id="controls">
-        <!-- <button id="add-random-point" onclick="addRandomPoint()">Add Random Point</button>
-        <button id="add-random-segment" onclick="addRandomSegment()">Add Random Segment</button>
-        <button id="remove-random-point" onclick="removeRandomPoint()">Remove Random Point</button>
-        <button id="remove-random-segment" onclick="removeRandomSegment()">Remove Random Segment</button>
-        <button id="remove-all" onclick="removeAll()">Remove All</button> -->
+        <button onclick="connectAll()">Fun times button</button>
+        <!-- <button id="add-random-point" onclick="randomShotgun()">Random shotgun</button> -->
+        <!-- <button id="add-random-segment" onclick="addRandomSegment()">Add Random Segment</button> -->
+        <!-- <button id="remove-random-point" onclick="removeRandomPoint()">Remove Random Point</button> -->
+        <!-- <button id="remove-random-segment" onclick="removeRandomSegment()">Remove Random Segment</button> -->
+        <button id="remove-all" onclick="removeAll()">Remove All</button>
     </div>
     <script src="js/primitives/point.js"></script>
     <script src="js/primitives/segment.js"></script>
@@ -23,17 +24,18 @@
     <script>
         const canvas = document.querySelector("canvas");
         const ctx = canvas.getContext("2d");
+
+        let shotgunMode = false;
         canvas.width = 600;
         canvas.height = 600;
         
-        function addRandomPoint() {
-            const success = graph.tryAddPoint(
-                new Point(
+        function randomShotgun() {
+            const randPoint = new Point(
                     Math.random() * canvas.width, 
                     Math.random() * canvas.height
                 )
-            );
-            
+        
+            shotgun(randPoint, 5000, 5);
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             graph.draw(ctx);
             console.log(success);
@@ -85,6 +87,15 @@
             graph.draw(ctx);
         }
 
+        function connectAll() {
+            console.log(graph.points);
+            for (const point1 of graph.points) {
+                for (const point2 of graph.points) {
+                graph.tryAddSegment(new Segment(point1, point2));
+            }
+            }
+        }
+
         // for funsies
         function shotgun(center, spread=50, shots=5) {
             for (let i = 0; i < 5; i++) {
@@ -102,18 +113,22 @@
         const s3 = new Segment(p1, p4);
         const s4 = new Segment(p2, p3);
 
-        const graph = new Graph([p1, p2, p3, p4], [s1, s2, s3, s4]);
+        const graph = new Graph([p1, p2, p3, p4], [s1, s2, s3, s4], null);
         const viewport = new Viewport(canvas);
-        const graphEditor = new GraphEditor(canvas, graph);
+        graph.viewport = viewport;
+        const graphEditor = new GraphEditor(viewport, graph);
 
         animate();
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // ctx.save();
-            // ctx.scale(1 / viewport.zoom, 1 / viewport.zoom);
+            ctx.save();
+            ctx.translate(viewport.zoomFrom.x, viewport.zoomFrom.y);
+            ctx.scale(1 / viewport.zoom, 1 / viewport.zoom);
+            const offset = viewport.getOffset();
+            ctx.translate(offset.x, offset.y);
             graphEditor.display();
-            // ctx.restore();
+            ctx.restore();
             requestAnimationFrame(animate)
         }
 
