@@ -65,6 +65,9 @@ class GraphEditor {
 
     #handleMouseUp(e) {
         if (e.button == 0) { // left click
+            if (this.dragging) { // 
+                this.selected = null;
+            }
             this.dragging = false;
         }
     }
